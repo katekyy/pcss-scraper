@@ -6,6 +6,7 @@ pcss-scraper
 *.so
 *.dylib
 *.dll
+log.txt
 
 # Ignore binary output folders
 bin/

@@ -5,6 +5,12 @@ import net.html
 
 import strings
 
+// const c_reset = ''
+// const c_red = ''
+// const c_green = ''
+// const c_yellow = ''
+// const c_bold = ''
+
 const c_reset = '\x1b[0m'
 const c_red = '\x1b[31m'
 const c_green = '\x1b[32m'
@@ -83,7 +89,6 @@ fn calculate_town(id string) []int {
 
 	print(c_bold+capitalize_str(id)+':'+c_reset)
 	if max_s != 0 {
-		
 		println(c_bold+'\n  Miejsca:   '+c_reset+max_s.str())
 		println(c_bold+'  Uczniowie: '+c_reset+total_s.str())
 		println(c_bold+'')
@@ -120,7 +125,7 @@ fn main() {
 		flood += data[2]
 	}
 
-	println('\n')
+	println('')
 	println(c_bold+'OGOLNIE (Wielkopolska):'+c_reset)
 	println(c_bold+'  Miejsca:   '+c_reset+max.str())
 	println(c_bold+'  Uczniowie: '+c_reset+total.str())
