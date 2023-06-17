@@ -89,14 +89,30 @@ fn calculate_town(id string) []int {
 
 	print(c_bold+capitalize_str(id)+':'+c_reset)
 	if max_s != 0 {
-		println(c_bold+'\n  Miejsca:   '+c_reset+max_s.str())
-		println(c_bold+'  Uczniowie: '+c_reset+total_s.str())
-		println(c_bold+'')
-		if flood_s <= 0 {
+		print(c_bold)
+		if max_s == 0 {
+			println(c_bold+'\n  Miejsca:   '+c_reset+c_yellow+'N/A')
+		} else {
+			println(c_bold+'\n  Miejsca:   '+c_reset+max_s.str())
+		}
+
+		print(c_bold)
+		if total_s == 0 {
+			println('  Uczniowie: '+c_reset+c_yellow+'N/A')
+		} else {
+			println('  Uczniowie: '+c_reset+total_s.str())
+		}
+
+		println(c_reset+c_bold)
+
+		if flood_s <= 0 && (total_s != 0 && max_s != 0){
 			println('  Nadmiar:   '+c_reset+c_green+'Brak')
+		} else if total_s == 0 || max_s == 0 {
+			println('  Nadmiar:   '+c_reset+c_yellow+'N/A')
 		} else {
 			println('  Nadmiar:   '+c_reset+c_red+flood_s.str())
 		}
+
 		println(c_reset+'\n----------------------------\n')
 		return [max_s, total_s, flood_s]
 	}
