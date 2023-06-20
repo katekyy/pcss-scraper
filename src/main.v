@@ -5,17 +5,13 @@ import net.html
 
 import strings
 
-// const c_reset = ''
-// const c_red = ''
-// const c_green = ''
-// const c_yellow = ''
-// const c_bold = ''
-
-const c_reset = '\x1b[0m'
-const c_red = '\x1b[31m'
-const c_green = '\x1b[32m'
-const c_yellow = '\x1b[33m'
-const c_bold = '\x1b[1m'
+const (
+    c_reset = '\x1b[0m'
+    c_red = '\x1b[31m'
+    c_green = '\x1b[32m'
+    c_yellow = '\x1b[33m'
+    c_bold = '\x1b[1m'
+)
 
 fn strip_end(str string) string {
 	s := str.reverse()
@@ -38,32 +34,28 @@ fn get_tags_content(tags []&html.Tag) []string {
 	return ctxs
 }
 
+fn get_students_count(tags []&html.Tag, even bool) int {
+    ctxs := get_tags_content(tags)
+
+    mut total := 0
+    mut i := 0
+
+    for n in ctxs {
+        if (even && i%2 == 0) || (!even && i%2 != 0) {
+            total += n.int()
+        }
+        i++
+    }
+
+    return total
+}
+
 fn get_max_students(tags []&html.Tag) int {
-	ctxs := get_tags_content(tags)
-
-	mut total := 0
-	mut i := 0
-
-	for n in ctxs {
-		if i%2 == 0 { total += n.int() }
-		i++
-	}
-
-	return total
+    return get_students_count(tags, true)
 }
 
 fn get_total_students(tags []&html.Tag) int {
-	ctxs := get_tags_content(tags)
-
-	mut total := 0
-	mut i := 0
-
-	for n in ctxs {
-		if i%2 != 0 { total += n.int() }
-		i++
-	}
-
-	return total
+    return get_students_count(tags, false)
 }
 
 fn capitalize_str(str string) string {
@@ -132,7 +124,9 @@ fn main() {
 	mut flood := 0
 
 	tags := body.get_tags_by_class_name('instances-list')[0].get_tags('li')
+
 	println(c_reset+'\n----------------------------\n')
+
 	for tag in tags {
 		data := calculate_town(parse_town_id(tag.get_tags('a')[0].attributes['href']))
 
@@ -146,10 +140,12 @@ fn main() {
 	println(c_bold+'  Miejsca:   '+c_reset+max.str())
 	println(c_bold+'  Uczniowie: '+c_reset+total.str())
 	println(c_bold+'')
+
 	if flood <= 0 {
 		println('  Nadmiar:   '+c_reset+c_green+'Brak')
 	} else {
 		println('  Nadmiar:   '+c_reset+c_red+flood.str())
 	}
+
 	println('\n')
 }
