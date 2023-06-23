@@ -11,7 +11,11 @@ const (
     c_green = '\x1b[32m'
     c_yellow = '\x1b[33m'
     c_bold = '\x1b[1m'
+
+	c_len = 5
 )
+
+const global_padding = 2
 
 fn strip_end(str string) string {
 	s := str.reverse()
@@ -69,6 +73,13 @@ fn parse_town_id(str string) string {
 	return extracted_string
 }
 
+fn print_padding(first_len int, second_len int, text string, additional int) {
+	for _ in 0..(first_len - second_len - text.len - (global_padding+1) + additional) {
+		print(' ')
+	}
+	println(text)
+}
+
 fn calculate_town(id string) []int {
 	resp := http.get('https://nabor.pcss.pl/'+id+'/szkolaponadpodstawowa/') or { panic(err) }
 	body := html.parse(resp.body)
@@ -79,38 +90,41 @@ fn calculate_town(id string) []int {
 	total_s := get_total_students(all_counters)
 	flood_s := total_s-max_s
 
-	print(c_bold+capitalize_str(id)+':'+c_reset)
+	town_name := capitalize_str(id)
+
+	spacer := '\n----------------------------\n'
+
+	print(c_bold+town_name+':'+c_reset+c_yellow)
 	if max_s != 0 {
-		print(c_bold)
+		print(c_reset+c_bold+'\n  Miejsca:   '+c_reset) /////
 		if max_s == 0 {
-			println(c_bold+'\n  Miejsca:   '+c_reset+c_yellow+'N/A')
+			print_padding(spacer.len, '  Miejsca:   '.len, c_yellow+'N/A', c_len)
 		} else {
-			println(c_bold+'\n  Miejsca:   '+c_reset+max_s.str())
+			print_padding(spacer.len, '  Miejsca:   '.len, max_s.str(), 0)
 		}
 
-		print(c_bold)
+		print(c_reset+c_bold+'  Uczniowie: '+c_reset)   /////
 		if total_s == 0 {
-			println('  Uczniowie: '+c_reset+c_yellow+'N/A')
+			print_padding(spacer.len, '  Uczniowie: '.len, c_yellow+'N/A', c_len)
 		} else {
-			println('  Uczniowie: '+c_reset+total_s.str())
+			print_padding(spacer.len, '  Uczniowie: '.len, total_s.str(), 0)
 		}
 
-		println(c_reset+c_bold)
-
+		print(c_reset+c_bold+'  Nadmiar:   '+c_reset) /////
 		if flood_s <= 0 && (total_s != 0 && max_s != 0){
-			println('  Nadmiar:   '+c_reset+c_green+'Brak')
+			print_padding(spacer.len, '  Nadmiar:   '.len, c_green+'Brak', c_len)
 		} else if total_s == 0 || max_s == 0 {
-			println('  Nadmiar:   '+c_reset+c_yellow+'N/A')
+			print_padding(spacer.len, '  Nadmiar:   '.len, c_yellow+'N/A', c_len)
 		} else {
-			println('  Nadmiar:   '+c_reset+c_red+flood_s.str())
+			print_padding(spacer.len, '  Nadmiar:   '.len, c_red+flood_s.str(), c_len)
 		}
 
-		println(c_reset+'\n----------------------------\n')
+		println(c_reset+spacer)
 		return [max_s, total_s, flood_s]
 	}
 
-	println(c_yellow+' N/A')
-	println(c_reset+'\n----------------------------\n')
+	print_padding(spacer.len, town_name.len+1, 'N/A', 0)
+	println(c_reset+spacer)
 
 	return [max_s, total_s, flood_s]
 }
@@ -125,7 +139,9 @@ fn main() {
 
 	tags := body.get_tags_by_class_name('instances-list')[0].get_tags('li')
 
-	println(c_reset+'\n----------------------------\n')
+	spacer := '\n----------------------------\n'
+
+	println(c_reset+spacer)
 
 	for tag in tags {
 		data := calculate_town(parse_town_id(tag.get_tags('a')[0].attributes['href']))
@@ -137,14 +153,14 @@ fn main() {
 
 	println('')
 	println(c_bold+'OGOLNIE (Wielkopolska):'+c_reset)
-	println(c_bold+'  Miejsca:   '+c_reset+max.str())
-	println(c_bold+'  Uczniowie: '+c_reset+total.str())
+	print(c_bold+'  Miejsca:   '+c_reset) print_padding(spacer.len, '  Miejsca:   '.len, max.str(), 0)
+	print(c_bold+'  Uczniowie: '+c_reset) print_padding(spacer.len, '  Uczniowie: '.len, total.str(), 0)
 	println(c_bold+'')
 
 	if flood <= 0 {
-		println('  Nadmiar:   '+c_reset+c_green+'Brak')
+		print('  Nadmiar:   '+c_reset+c_green) print_padding(spacer.len, '  Nadmiar:   '.len, 'Brak', 0)
 	} else {
-		println('  Nadmiar:   '+c_reset+c_red+flood.str())
+		print('  Nadmiar:   '+c_reset+c_red) print_padding(spacer.len, '  Nadmiar:   '.len, flood.str(), 0)
 	}
 
 	println('\n')
